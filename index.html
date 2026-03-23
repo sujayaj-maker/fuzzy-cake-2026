@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday Thomas!</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Playfair+Display:ital,wght@0,600;1,600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#1a1a2e;overflow-x:hidden;}
+.wrap{background:#1a1a2e;min-height:100vh;font-family:'Press Start 2P',monospace;position:relative;overflow:hidden;}
+#bgCanvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;}
+.stickers{position:absolute;inset:0;pointer-events:none;z-index:1;}
+.poster{position:absolute;background:#fff;padding:10px 10px 40px;box-shadow:3px 4px 12px rgba(0,0,0,0.6);pointer-events:none;z-index:1;}
+.poster-inner{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;}
+.poster-caption{position:absolute;bottom:7px;left:4px;right:4px;text-align:center;font-family:'Playfair Display',serif;font-size:11px;font-weight:600;color:#222;font-style:italic;line-height:1.3;}
+.top-bar{position:relative;z-index:10;background:#16213e;border-bottom:3px solid #e94560;padding:12px 16px;text-align:center;}
+.top-bar h1{font-size:16px;color:#e94560;letter-spacing:1px;margin-bottom:5px;}
+.top-bar p{font-size:9px;color:#ffd700;line-height:1.8;}
+.prog-row{position:relative;z-index:10;padding:8px 16px;display:flex;align-items:center;gap:10px;}
+.prog-label{font-size:7px;color:#a8d8ea;white-space:nowrap;}
+.pb-track{flex:1;height:8px;background:#0f3460;border:1px solid #e94560;}
+.pb-fill{height:100%;width:0%;background:#e94560;transition:width 0.5s;}
+.prog-count{font-size:7px;color:#ffd700;white-space:nowrap;}
+.hint{position:relative;z-index:10;text-align:center;font-size:7px;color:#a8d8ea;padding:4px 0 2px;letter-spacing:1px;}
+.tl-outer{position:relative;z-index:5;display:flex;justify-content:center;padding:16px 0 40px;}
+.tl-col{display:flex;flex-direction:column;align-items:center;width:80px;}
+.fp-seg{display:flex;flex-direction:column;align-items:center;gap:0;padding:2px 0;}
+.fp-step{height:22px;display:flex;align-items:center;justify-content:center;}
+.fp-step.right-foot{margin-left:12px;}
+.fp-step.left-foot{margin-right:12px;}
+.photo-circle{width:62px;height:62px;border-radius:50%;overflow:hidden;flex-shrink:0;border:3px solid rgba(255,255,255,0.18);background:#0f3460;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color 0.3s;}
+.photo-circle:hover{border-color:rgba(255,255,255,0.5);}
+.photo-circle.done{border-color:#a8d8ea;}
+.photo-circle .ph{width:100%;height:100%;background:linear-gradient(135deg,#1e2a4a,#0f3460);}
+.photo-circle img{width:100%;height:100%;object-fit:cover;}
+.avatar-wrap{display:flex;justify-content:center;margin:2px 0;position:relative;z-index:3;}
+.avatar-el{width:62px;height:62px;border-radius:50%;border:3px solid #ffd700;overflow:hidden;background:#0f3460;box-shadow:0 0 0 4px rgba(255,215,0,0.2);display:flex;align-items:center;justify-content:center;}
+.avatar-el img{width:100%;height:100%;object-fit:cover;object-position:center;}
+.gift-wrap{display:flex;flex-direction:column;align-items:center;margin-top:4px;}
+.gift-node{width:62px;height:62px;border-radius:14px;background:#0d0d1a;border:3px solid #333;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:not-allowed;transition:all 0.4s;}
+.gift-node.unlocked{background:#1a4a1a;border-color:#ffd700;cursor:pointer;box-shadow:0 0 18px rgba(255,215,0,0.3);}
+.gift-emoji{font-size:24px;opacity:0.3;transition:opacity 0.4s;}
+.gift-node.unlocked .gift-emoji{opacity:1;}
+.gift-lbl{font-size:6px;color:#444;transition:color 0.4s;}
+.gift-node.unlocked .gift-lbl{color:#ffd700;}
+.score-pop{position:fixed;pointer-events:none;z-index:999;font-family:'Press Start 2P',monospace;font-size:11px;color:#ffd700;text-shadow:0 0 8px rgba(255,215,0,0.8);animation:popUp 1.4s ease-out forwards;}
+@keyframes popUp{0%{opacity:1;transform:translateY(0);}100%{opacity:0;transform:translateY(-70px);}}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.82);display:flex;align-items:center;justify-content:center;z-index:300;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+.modal-bg.show{opacity:1;pointer-events:all;}
+.modal-box{background:#16213e;border:3px solid #e94560;max-width:300px;width:90%;text-align:center;transform:scale(0.9);transition:transform 0.2s;display:flex;flex-direction:column;max-height:85vh;}
+.modal-bg.show .modal-box{transform:scale(1);}
+.modal-scroll{flex:1;overflow-y:auto;padding:22px 18px 12px;}
+.modal-from{font-size:7px;color:#a8d8ea;margin-bottom:5px;letter-spacing:1px;}
+.modal-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:600;font-style:italic;color:#ffd700;margin-bottom:14px;line-height:1.6;}
+.modal-wish{font-family:Georgia,serif;font-size:16px;color:#e0e0e0;line-height:1.8;}
+.modal-cta{background:#16213e;padding:14px 18px 18px;border-top:1px solid #2a2a4a;flex-shrink:0;}
+.modal-btn{font-family:'Press Start 2P',monospace;font-size:12px;padding:16px 20px;background:#fff;color:#16213e;border:none;cursor:pointer;width:100%;}
+.code-display{background:#0f3460;border:2px solid #ffd700;padding:8px 12px;font-family:monospace;font-size:15px;font-weight:700;color:#ffd700;letter-spacing:3px;margin-bottom:0;display:flex;align-items:center;justify-content:space-between;}
+.copy-btn{font-family:'Press Start 2P',monospace;font-size:7px;padding:4px 8px;background:#ffd700;color:#1a1a2e;border:none;cursor:pointer;}
+
+/* ── Birthday popup ── */
+.bday-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.88);display:flex;align-items:center;justify-content:center;z-index:500;transition:opacity 0.4s;}
+.bday-overlay.hide{opacity:0;pointer-events:none;display:none;}
+.bday-card{background:#fff;padding:16px 16px 48px;max-width:320px;width:92%;;position:relative;box-shadow:4px 6px 24px rgba(0,0,0,0.7);transform:rotate(-1.5deg);}
+.bday-photo{width:100%;aspect-ratio:2.8/3.5;background:linear-gradient(135deg,#c9d6e3,#a8becc);display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.bday-photo .ph-face{font-size:48px;opacity:0.4;}
+.bday-msg-wrap{position:absolute;bottom:0;left:0;right:0;background:#fff;padding:10px 14px 14px;text-align:center;}
+.bday-name{font-family:'Playfair Display',serif;font-size:20px;font-weight:600;color:#1a1a2e;font-style:italic;line-height:1.3;}
+/* ── Georgia sub body ── */
+.bday-sub{font-family:Georgia,serif;font-size:12px;font-weight:bold;color:#555;margin-top:5px;line-height:1.6;font-style:italic;}
+.bday-sticker{position:absolute;font-size:40px;pointer-events:none;z-index:10;}
+.tape{position:absolute;height:16px;background:rgba(255,220,80,0.55);transform:rotate(-6deg);}
+.tape2{position:absolute;height:14px;background:rgba(180,220,180,0.5);transform:rotate(4deg);}
+.bday-close{font-family:'Press Start 2P',monospace;font-size:12px;padding:16px 24px;background:#e94560;color:#fff;border:none;cursor:pointer;margin-top:16px;width:100%;letter-spacing:1px;}
+#bdayCanvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:499;}
+</style>
+</head>
+<body>
+
+<canvas id="bdayCanvas"></canvas>
+
+<!-- Birthday popup -->
+<div class="bday-overlay" id="bdayOverlay">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:12px;width:88%;max-width:290px;">
+    <div class="bday-card">
+      <div class="tape" style="top:-6px;left:20px;width:60px;"></div>
+      <div class="tape2" style="top:-5px;right:16px;width:48px;"></div>
+      <div class="bday-photo">
+        <img src="team_photos/Thomas.png" style="width:100%;height:100%;object-fit:cover;">
+      </div>
+      <span class="bday-sticker" style="top:-14px;left:-10px;transform:rotate(-20deg);">🥖</span>
+      <span class="bday-sticker" style="top:-10px;right:-12px;transform:rotate(15deg);">☕</span>
+      <span class="bday-sticker" style="bottom:50px;left:-18px;transform:rotate(-10deg);">🎬</span>
+      <span class="bday-sticker" style="bottom:48px;right:-16px;transform:rotate(12deg);">👟</span>
+      <span class="bday-sticker" style="top:30%;left:-18px;transform:rotate(8deg);">🏓</span>
+      <span class="bday-sticker" style="top:55%;right:-16px;transform:rotate(-14deg);">🥗</span>
+      <div class="bday-msg-wrap">
+        <div class="bday-name">Happy Birthday, Thomas!</div>
+        <div class="bday-sub">Alles Gute zum Geburtstag! 🎂<br>Here's to more coffee runs, 🥖 baguettes &amp; perfectly rounded corners ✦</div>
+      </div>
+    </div>
+    <button class="bday-close" onclick="closeBday()">C'est parti! ▶</button>
+  </div>
+</div>
+
+<!-- Main page -->
+<div class="wrap" id="wrap">
+  <canvas id="bgCanvas"></canvas>
+  <div class="stickers" id="stickers"></div>
+  <div class="top-bar">
+    <h1>★ HAPPY BIRTHDAY THOMAS ★</h1>
+    <p>Your team left you something special.<br>Open every message — they mean it. 🎂</p>
+  </div>
+  <div class="prog-row">
+    <span class="prog-label">XP</span>
+    <div class="pb-track"><div class="pb-fill" id="pbFill"></div></div>
+    <span class="prog-count" id="progCount">0/11</span>
+  </div>
+  <div class="hint">↑ ↓ ARROW KEYS OR TAP TO OPEN WISHES</div>
+  <div class="tl-outer"><div class="tl-col" id="tlCol"></div></div>
+</div>
+
+<!-- Wish modal -->
+<div class="modal-bg" id="wishModal">
+  <div class="modal-box">
+    <div class="modal-scroll">
+      <div class="modal-from">MESSAGE FROM</div>
+      <div class="modal-title" id="mTitle">—</div>
+      <div class="modal-wish" id="mWish">...</div>
+    </div>
+    <div class="modal-cta">
+      <button class="modal-btn" onclick="closeWish()">▶ CONTINUE</button>
+    </div>
+  </div>
+</div>
+
+<!-- Gift modal -->
+<div class="modal-bg" id="giftModal">
+  <div class="modal-box" style="border-color:#ffd700;">
+    <div class="modal-scroll">
+      <div class="modal-from" style="color:#ffd700;">★ QUEST COMPLETE ★</div>
+      <div style="font-size:30px;margin:10px 0;">🎁</div>
+      <div class="modal-title">GIFT CARD UNLOCKED!</div>
+      <div style="font-family:system-ui,sans-serif;font-size:12px;color:#a8d8ea;margin-bottom:14px;">From the whole team — happy birthday!</div>
+      <div class="code-display">
+        <!-- REPLACE: swap BDAY-2026-GIFT with the real gift card code -->
+        BDAY-2026-GIFT
+        <button class="copy-btn" id="copyBtn" onclick="copyCode()">COPY</button>
+      </div>
+    </div>
+    <div class="modal-cta" style="border-top:1px solid #2a2a4a;">
+      <button class="modal-btn" style="background:#ffd700;color:#1a1a2e;" onclick="closeGift()">★ AWESOME ★</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// EDIT HERE — swap in real data before sharing with Thomas
+// ============================================================
+const GIFT_CODE = "BDAY-2026-GIFT"; // REPLACE with real gift card code
+
+const teammates = [
+  { name:"Tereza",    photoSrc:"team_photos/Tereza.png", wish:"Happiest of birthdays, Thomas! I hope your day is full of love, laughter, and some banging tunes 🎸🎙️🥁 Here's to many more!!" },
+  { name:"Azal",      photoSrc:"team_photos/Azal.png", wish:"Cher Thomas, Je te souhaite un très joyeux anniversaire ! J'espère que cette année t'apportera beaucoup de rires, de sourires et de beaux moments en famille." },
+  { name:"Amelia",    photoSrc:"team_photos/Amelia.png", wish:"Happy birthday Thomas! We're all lucky to have you as a colleague. You're always insightful, thoughtful and down for a nice chat. I hope this new year brings you a lot of new experiences, some restful and some fun. Here's to many more 😊" },
+  { name:"Timo",      photoSrc:"team_photos/Timo.png", attachedPhoto:"team_photos/Timo-extra.png", wish:"Häppy Birsday, Thomas 🎉 May your sparkling white shoes and immaculate corner radii continue to inspire us for many more solar rotations to come, you magnificent petanque god, you." },
+  { name:"Laura",     photoSrc:"team_photos/Laura.png", wish:"Bon anniversaire, Thomas! Alles Liebe, viel Kuchen und Champagner (für dich als Franzosen natürlich ein Muss!) zu deinem Ehrentag - lass dich feiern! 🥂🎂" },
+  { name:"Guillaume", photoSrc:"team_photos/Guillaume.png", wish:"Wishing you a wonderful birthday day Thomas! Hope you'll be enjoying it with your loved ones doing your favorite activities. Cheers to another year of sad salads, petanque and never ending loss at ping pong. 😄" },
+  { name:"Izzy",      photoSrc:"team_photos/Izzy.png", wish:"Thomas, alles Gute zum Geburtstag! Hope you have a wonderful day filled with all the things that bring you joy 🤗 Sending best wishes and some sunshine from Australia ☀️😎" },
+  { name:"Sujay",     photoSrc:"team_photos/Sujay.png", wish:"Still writing... ✍️" },
+  { name:"Albert",    photoSrc:"team_photos/Albert.png", wish:"Still writing... ✍️" },
+  { name:"Tom",       photoSrc:"team_photos/Tom.png", wish:"Still writing... ✍️" },
+  { name:"Lizzy",     photoSrc:"team_photos/Lizzy.png", attachedPhoto:"team_photos/Lizzy-extra.png", wideModal:true, wish:"Alles Gute zum Geburtstag 🇩🇪 Joyeux anniversaire 🇫🇷 and Lá breithe shona duit 🇮🇪 to the international icon that you are, Thomas! Wishing you the most wonderful day of celebrations and joy surrounded by your loved ones 💗 ✨ Thank you for being the best-est desk buddy and for always brightening up the 4th floor with your stories, music recommendations and obscure 90s video references. Hope this year brings you lots of happiness - here's to many more 🍾💗" },
+  { name:"Ana",       photoSrc:"team_photos/Ana.png", wish:"Still writing... ✍️" },
+];
+// ============================================================
+
+const opened = new Set();
+let avatarPos = 0;
+
+// ── Birthday confetti ─────────────────────────────────
+const bdayCanvas = document.getElementById('bdayCanvas');
+const bdayCtx = bdayCanvas.getContext('2d');
+bdayCanvas.width = window.innerWidth; bdayCanvas.height = window.innerHeight;
+window.addEventListener('resize', () => { bdayCanvas.width = window.innerWidth; bdayCanvas.height = window.innerHeight; });
+let bdayParts = [], bdayAnim = null;
+const CCOLS = ['#e94560','#ffd700','#4caf50','#2196f3','#a259ff','#ff6b6b','#00d4ff','#fff'];
+function burstConfetti() {
+  bdayParts = [];
+  const cx = window.innerWidth/2, cy = window.innerHeight/2;
+  for (let i = 0; i < 200; i++) {
+    const angle = Math.random()*Math.PI*2, speed = 4+Math.random()*12;
+    bdayParts.push({ x:cx, y:cy, vx:Math.cos(angle)*speed, vy:Math.sin(angle)*speed-5, w:5+Math.random()*6, h:3+Math.random()*4, rot:Math.random()*360, rotV:(Math.random()-0.5)*8, col:CCOLS[Math.floor(Math.random()*CCOLS.length)], alpha:1 });
+  }
+  function step() {
+    bdayCtx.clearRect(0,0,bdayCanvas.width,bdayCanvas.height);
+    bdayParts = bdayParts.filter(p => {
+      p.x+=p.vx; p.y+=p.vy; p.vy+=0.25; p.rot+=p.rotV; p.alpha-=0.011;
+      if (p.alpha<=0) return false;
+      bdayCtx.save(); bdayCtx.globalAlpha=p.alpha; bdayCtx.translate(p.x,p.y); bdayCtx.rotate(p.rot*Math.PI/180); bdayCtx.fillStyle=p.col; bdayCtx.fillRect(-p.w/2,-p.h/2,p.w,p.h); bdayCtx.restore();
+      return true;
+    });
+    if (bdayParts.length) bdayAnim = requestAnimationFrame(step);
+    else bdayCtx.clearRect(0,0,bdayCanvas.width,bdayCanvas.height);
+  }
+  if (bdayAnim) cancelAnimationFrame(bdayAnim);
+  bdayAnim = requestAnimationFrame(step);
+}
+setTimeout(burstConfetti, 300);
+function closeBday() {
+  burstConfetti();
+  const ov = document.getElementById('bdayOverlay');
+  ov.style.transition = 'opacity 0.4s';
+  ov.style.opacity = '0';
+  setTimeout(() => { ov.style.display = 'none'; ov.style.opacity = '1'; }, 420);
+}
+
+// ── Avatar ────────────────────────────────────────────
+function makeAvatarSrc() {
+  const oc = document.createElement('canvas'); oc.width=88; oc.height=88;
+  const c = oc.getContext('2d');
+  c.beginPath(); c.arc(44,34,20,0,Math.PI*2); c.fillStyle='#e8c9a0'; c.fill();
+  c.beginPath(); c.arc(44,22,20,Math.PI,Math.PI*2); c.fillStyle='#aaaaaa'; c.fill();
+  c.beginPath(); c.arc(44,40,13,0,Math.PI); c.fillStyle='#bbbbbb'; c.fill();
+  c.fillStyle='#444';
+  c.beginPath(); c.arc(37,32,2.5,0,Math.PI*2); c.fill();
+  c.beginPath(); c.arc(51,32,2.5,0,Math.PI*2); c.fill();
+  c.beginPath(); c.arc(44,37,7,0.1*Math.PI,0.9*Math.PI); c.strokeStyle='#666'; c.lineWidth=1.5; c.stroke();
+  c.beginPath(); c.arc(44,78,24,Math.PI,Math.PI*2); c.fillStyle='#222'; c.fill();
+  return oc.toDataURL();
+}
+const AVATAR_SRC = 'team_photos/Avatar.png';
+
+// ── SVG footprint ─────────────────────────────────────
+function footSVG(side, walked) {
+  const flip = side==='right' ? 'scale(-1,1) translate(-14,0)' : '';
+  const col = walked ? 'white' : 'rgba(255,255,255,0.2)';
+  return `<svg width="14" height="22" viewBox="0 0 14 22" xmlns="http://www.w3.org/2000/svg"><g transform="${flip}"><ellipse cx="7" cy="15" rx="5" ry="6.5" fill="${col}"/><ellipse cx="5.5" cy="8.5" rx="2.8" ry="3.5" fill="${col}"/><ellipse cx="9" cy="7" rx="2" ry="2.5" fill="${col}"/><ellipse cx="5" cy="5" rx="1.5" ry="2" fill="${col}"/><ellipse cx="8.5" cy="3.5" rx="1.3" ry="1.8" fill="${col}"/></g></svg>`;
+}
+function makeFpSeg(id, walked) {
+  const seg = document.createElement('div'); seg.className='fp-seg'; seg.id='fp-seg-'+id;
+  [{side:'left'},{side:'right'},{side:'left'},{side:'right'}].forEach((s,fi) => {
+    const step = document.createElement('div');
+    step.className = 'fp-step '+(s.side==='right'?'right-foot':'left-foot');
+    step.id = `fp-${id}-${fi}`; step.innerHTML = footSVG(s.side, walked);
+    seg.appendChild(step);
+  });
+  return seg;
+}
+
+// ── BG canvas ─────────────────────────────────────────
+const bgCanvas = document.getElementById('bgCanvas');
+const bgCtx = bgCanvas.getContext('2d');
+let W, H, particles = [], scrollY = 0;
+function resize() { W=bgCanvas.width=window.innerWidth; H=bgCanvas.height=window.innerHeight; }
+resize(); window.addEventListener('resize', resize);
+const ICONS = ['🥖','🥐','🇫🇷','👟','🕹️','❤️','🎬','🍿','☕','🎂','🏓','🥗'];
+const CONF_COLS = ['#e94560','#ffd700','#4caf50','#2196f3','#a259ff','#ff6b6b','#00d4ff'];
+function makeP(type) {
+  const x=Math.random()*W, y=type==='confetti'?-20:H+30;
+  if(type==='confetti') return{type,x,y,w:5+Math.random()*5,h:3+Math.random()*3,rot:Math.random()*360,rotV:(Math.random()-0.5)*3,vx:(Math.random()-0.5)*1,vy:0.7+Math.random()*1,col:CONF_COLS[Math.floor(Math.random()*CONF_COLS.length)],opacity:0.7+Math.random()*0.2};
+  if(type==='balloon'){const cols=['#e94560','#ffd700','#4caf50','#a259ff','#00d4ff'];return{type,x,y,r:14+Math.random()*10,vx:(Math.random()-0.5)*0.4,vy:-(0.4+Math.random()*0.6),wobble:Math.random()*Math.PI*2,wobbleS:0.02+Math.random()*0.02,col:cols[Math.floor(Math.random()*cols.length)],opacity:0.7+Math.random()*0.3};}
+  return{type:'icon',x,y,icon:ICONS[Math.floor(Math.random()*ICONS.length)],size:14+Math.random()*12,vy:-(0.35+Math.random()*0.55),vx:(Math.random()-0.5)*0.35,opacity:0.7+Math.random()*0.3,wobble:Math.random()*Math.PI*2,wobbleS:0.015+Math.random()*0.02};
+}
+for(let i=0;i<7;i++) particles.push(makeP('confetti'));
+for(let i=0;i<3;i++) particles.push(makeP('balloon'));
+for(let i=0;i<10;i++) particles.push(makeP('icon'));
+window.addEventListener('scroll', () => { scrollY = window.scrollY; });
+let bgFrame = 0;
+function animateBg() {
+  requestAnimationFrame(animateBg); bgCtx.clearRect(0,0,W,H); bgFrame++;
+  if(bgFrame%65===0) particles.push(makeP('confetti'));
+  if(bgFrame%190===0) particles.push(makeP('balloon'));
+  if(bgFrame%100===0) particles.push(makeP('icon'));
+  const pxOff = scrollY*0.35;
+  particles = particles.filter(p => {
+    if(p.type==='confetti'){p.x+=p.vx;p.y+=p.vy;p.rot+=p.rotV;const sy=p.y-pxOff*0.2;if(sy>H+20)return false;bgCtx.save();bgCtx.globalAlpha=p.opacity;bgCtx.translate(p.x,sy);bgCtx.rotate(p.rot*Math.PI/180);bgCtx.fillStyle=p.col;bgCtx.fillRect(-p.w/2,-p.h/2,p.w,p.h);bgCtx.restore();}
+    else if(p.type==='balloon'){p.wobble+=p.wobbleS;p.x+=p.vx+Math.sin(p.wobble)*0.4;p.y+=p.vy;const sy=p.y+pxOff*0.4;if(sy<-60)return false;bgCtx.save();bgCtx.globalAlpha=p.opacity;bgCtx.beginPath();bgCtx.ellipse(p.x,sy,p.r,p.r*1.2,0,0,Math.PI*2);bgCtx.fillStyle=p.col;bgCtx.fill();bgCtx.beginPath();bgCtx.moveTo(p.x,sy+p.r*1.2+3);bgCtx.bezierCurveTo(p.x+6,sy+p.r*1.2+12,p.x-6,sy+p.r*1.2+20,p.x,sy+p.r*1.2+28);bgCtx.strokeStyle='rgba(255,255,255,0.3)';bgCtx.lineWidth=1;bgCtx.stroke();bgCtx.restore();}
+    else{p.wobble+=p.wobbleS;p.x+=p.vx+Math.sin(p.wobble)*0.5;p.y+=p.vy;const sy=p.y+pxOff*0.55;if(sy<-40)return false;bgCtx.save();bgCtx.globalAlpha=p.opacity;bgCtx.font=p.size+'px serif';bgCtx.textAlign='center';bgCtx.textBaseline='middle';bgCtx.fillText(p.icon,p.x,sy);bgCtx.restore();}
+    return true;
+  });
+}
+animateBg();
+
+// ── Posters ───────────────────────────────────────────
+function posterContent(type,w,h){
+  if(type==='france')return`<img src="team_photos/France.png" style="width:100%;height:100%;object-fit:cover;">`;
+  if(type==='figma')return`<img src="team_photos/Figma.png" style="width:100%;height:100%;object-fit:cover;">`;
+  if(type==='movie')return`<img src="team_photos/Movie.png" style="width:100%;height:100%;object-fit:cover;">`;
+  if(type==='game')return`<img src="team_photos/Game.png" style="width:100%;height:100%;object-fit:cover;">`;
+  if(type==='coffee')return`<img src="team_photos/Coffee.png" style="width:100%;height:100%;object-fit:cover;">`;
+  return`<img src="team_photos/Random.jpg" style="width:100%;height:100%;object-fit:cover;">`;
+}
+function posterCaption(type){return{france:"Oui, c'est toi!",figma:'Corner radius always 8px',movie:'lights, camera, Thomas',game:'🕹️ non merci',coffee:'☕ on my way, 5 more mins',random:"here's to 2026"}[type]||'';}
+function buildPosters(){
+  const wrap=document.getElementById('stickers');
+  [{top:'8%',left:'2%',w:240,rot:-11,type:'france'},{top:'20%',right:'2%',w:228,rot:8,type:'figma'},{top:'40%',left:'2%',w:236,rot:-7,type:'movie'},{top:'59%',right:'2%',w:224,rot:11,type:'game'},{top:'76%',left:'2%',w:232,rot:-9,type:'coffee'},{top:'85%',right:'2%',w:220,rot:7,type:'random'}].forEach(p=>{
+    const el=document.createElement('div');el.className='poster';
+    const h=p.w*1.25;
+    el.style.cssText=`width:${p.w}px;height:${h}px;top:${p.top};left:${p.left||'auto'};right:${p.right||'auto'};transform:rotate(${p.rot}deg);opacity:1;`;
+    const inner=document.createElement('div');inner.className='poster-inner';inner.style.height=(h-40)+'px';inner.innerHTML=posterContent(p.type,p.w,h-40);
+    el.appendChild(inner);
+    const cap=document.createElement('div');cap.className='poster-caption';cap.textContent=posterCaption(p.type);el.appendChild(cap);
+    wrap.appendChild(el);
+  });
+}
+
+// ── Timeline ──────────────────────────────────────────
+function buildTimeline(){
+  const col=document.getElementById('tlCol');col.innerHTML='';
+  col.appendChild(makeAvatarEl());
+  teammates.forEach((t,i)=>{
+    col.appendChild(makeFpSeg(i,false));
+    const photo=document.createElement('div');photo.className='photo-circle';photo.id='photo-'+i;
+    photo.onclick=()=>openWish(i);
+    if(t.photoSrc){const img=document.createElement('img');img.src=t.photoSrc;photo.appendChild(img);}
+    else{const ph=document.createElement('div');ph.className='ph';photo.appendChild(ph);}
+    col.appendChild(photo);
+  });
+  col.appendChild(makeFpSeg('gift',false));
+  const gw=document.createElement('div');gw.className='gift-wrap';
+  const gn=document.createElement('div');gn.className='gift-node';gn.id='giftNode';gn.onclick=tryGift;
+  gn.innerHTML='<span class="gift-emoji">🎁</span><span class="gift-lbl">GIFT</span>';
+  gw.appendChild(gn);col.appendChild(gw);
+  updateAvatar();
+}
+function makeAvatarEl(){
+  const wrap=document.createElement('div');wrap.className='avatar-wrap';wrap.id='avatarWrap';
+  const el=document.createElement('div');el.className='avatar-el';
+  const img=document.createElement('img');img.src=AVATAR_SRC;el.appendChild(img);wrap.appendChild(el);
+  return wrap;
+}
+function updateAvatar(){
+  const col=document.getElementById('tlCol');if(!col)return;
+  const old=document.getElementById('avatarWrap');if(old)old.remove();
+  const av=makeAvatarEl();
+  if(avatarPos===0){col.insertBefore(av,document.getElementById('fp-seg-0'));}
+  else if(avatarPos<=11){document.getElementById('photo-'+(avatarPos-1)).insertAdjacentElement('afterend',av);if(!opened.has(avatarPos-1))setTimeout(()=>openWish(avatarPos-1),300);}
+  else{col.insertBefore(av,document.querySelector('.gift-wrap'));}
+  for(let i=0;i<11;i++){
+    [{side:'left'},{side:'right'},{side:'left'},{side:'right'}].forEach((s,fi)=>{
+      const step=document.getElementById(`fp-${i}-${fi}`);
+      if(step)step.innerHTML=footSVG(s.side,i<avatarPos);
+    });
+  }
+  [{side:'left'},{side:'right'},{side:'left'},{side:'right'}].forEach((s,fi)=>{
+    const step=document.getElementById(`fp-gift-${fi}`);
+    if(step)step.innerHTML=footSVG(s.side,avatarPos>=12);
+  });
+  av.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function moveAvatar(dir){
+  if(dir==='down'&&avatarPos<12)avatarPos++;
+  else if(dir==='up'&&avatarPos>0)avatarPos--;
+  else return;
+  updateAvatar();
+}
+function openWish(i){
+  const t=teammates[i];
+  if(!opened.has(i)){
+    opened.add(i);
+    document.getElementById('photo-'+i).classList.add('done');
+    const r=document.getElementById('photo-'+i).getBoundingClientRect();
+    spawnPop(r.left+r.width/2-30,r.top-10,'+100 XP ★');
+    document.getElementById('pbFill').style.width=Math.round(opened.size/12*100)+'%';
+    document.getElementById('progCount').textContent=opened.size+'/12';
+    if(opened.size===12){const gn=document.getElementById('giftNode');if(gn)gn.classList.add('unlocked');}
+  }
+  document.querySelector('.modal-box').style.maxWidth = t.wideModal ? '640px' : '320px';
+  document.getElementById('mTitle').textContent=t.name.toUpperCase();
+  document.getElementById('mWish').textContent=t.wish;
+if(t.attachedPhoto){
+  const img=document.createElement('img');
+  img.src=t.attachedPhoto;
+  img.style.cssText='width:50%;border-radius:8px;margin-top:14px;object-fit:cover;';
+  document.getElementById('mWish').appendChild(img);
+}
+  document.getElementById('wishModal').classList.add('show');
+}
+function closeWish(){document.getElementById('wishModal').classList.remove('show');}
+function tryGift(){
+  if(opened.size<12){spawnPop(window.innerWidth/2-80,window.innerHeight/3,'OPEN ALL WISHES FIRST!');return;}
+  document.getElementById('giftModal').classList.add('show');
+}
+function closeGift(){document.getElementById('giftModal').classList.remove('show');}
+function copyCode(){
+  navigator.clipboard.writeText(GIFT_CODE).catch(()=>{});
+  const b=document.getElementById('copyBtn');
+  if(b){b.textContent='DONE!';setTimeout(()=>b.textContent='COPY',1500);}
+}
+function spawnPop(x,y,text){
+  const el=document.createElement('div');el.className='score-pop';el.textContent=text;
+  el.style.cssText=`left:${x}px;top:${y}px;`;document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1400);
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowDown'){e.preventDefault();moveAvatar('down');}
+  if(e.key==='ArrowUp'){e.preventDefault();moveAvatar('up');}
+});
+
+buildPosters();
+buildTimeline();
+</script>
+</body>
+</html>

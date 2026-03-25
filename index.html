@@ -137,20 +137,46 @@ body{background:#1a1a2e;overflow-x:hidden;}
 
 <!-- Gift modal -->
 <div class="modal-bg" id="giftModal">
-  <div class="modal-box" style="border-color:#ffd700;">
+  <div class="modal-box" style="border-color:#ffd700;max-width:480px;">
     <div class="modal-scroll">
       <div class="modal-from" style="color:#ffd700;">★ QUEST COMPLETE ★</div>
-      <div style="font-size:30px;margin:10px 0;">🎁</div>
-      <div class="modal-title">GIFT CARD UNLOCKED!</div>
-      <div style="font-family:system-ui,sans-serif;font-size:12px;color:#a8d8ea;margin-bottom:14px;">From the whole team — happy birthday!</div>
-      <div class="code-display">
-        <!-- REPLACE: swap BDAY-2026-GIFT with the real gift card code -->
-        BDAY-2026-GIFT
-        <button class="copy-btn" id="copyBtn" onclick="copyCode()">COPY</button>
+      <div style="font-size:28px;margin:8px 0;">🎁</div>
+      <div class="modal-title" style="margin-bottom:16px;">Your team got you these gifts!</div>
+      <!-- Gift 1: GoBoat -->
+      <div style="display:flex;gap:10px;margin-bottom:4px;align-items:stretch;">
+        <div style="background:#0f3460;border:1.5px solid #ffd700;border-radius:10px;padding:14px;flex:1;text-align:left;">
+        <div style="font-family:'Press Start 2P',monospace;font-size:7px;color:#ffd700;margin-bottom:6px;">⛵ GOBOAT BERLIN</div>
+        <div style="font-family:Georgia,serif;font-size:12px;color:#a8d8ea;margin-bottom:10px;font-style:italic;">A cosy 2-hour ride on the Spree. No licence needed. Bring a picnic!</div>
+        <div style="display:flex;gap:6px;flex-wrap:nowrap;margin-bottom:10px;">
+          <span style="background:#1a1a3a;border:1px solid #2a2a6a;border-radius:20px;padding:3px 8px;font-family:Georgia,serif;font-size:11px;color:#a8d8ea;">📍 Berlin Osthafen</span>
+          <span style="background:#1a1a3a;border:1px solid #2a2a6a;border-radius:20px;padding:3px 8px;font-family:Georgia,serif;font-size:11px;color:#a8d8ea;">⏳ Expires Mar 2029</span>
+        </div>
+        <div style="background:#16213e;border:1.5px solid #ffd700;border-radius:6px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-family:monospace;font-size:13px;font-weight:700;color:#ffd700;letter-spacing:2px;">X6pWDibUb8km</span>
+          <button class="copy-btn" onclick="copyIt('X6pWDibUb8km',this)">COPY</button>
+        </div>
+        <div style="text-align:center;margin-top:8px;"><a href="goboat.pdf" download style="font-family:Georgia,serif;font-size:11px;color:#4caf50;">⬇ Download voucher</a></div>
       </div>
+
+      <!-- Gift 2: Museum Barberini -->
+      <div style="display:flex;gap:10px;margin-bottom:4px;align-items:stretch;">
+        <div style="background:#0f3460;border:1.5px solid #ffd700;border-radius:10px;padding:14px;flex:1;text-align:left;">
+        <div style="font-family:'Press Start 2P',monospace;font-size:7px;color:#ffd700;margin-bottom:6px;">🎨 MUSEUM BARBERINI</div>
+        <div style="font-family:Georgia,serif;font-size:12px;color:#a8d8ea;margin-bottom:10px;font-style:italic;">€40 voucher for tickets, combo tickets or food & drinks at the café.</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+          <span style="background:#1a1a3a;border:1px solid #2a2a6a;border-radius:20px;padding:3px 8px;font-family:Georgia,serif;font-size:11px;color:#a8d8ea;">📍 Potsdam</span>
+        </div>
+        <div style="background:#16213e;border:1.5px solid #ffd700;border-radius:6px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-family:monospace;font-size:13px;font-weight:700;color:#ffd700;letter-spacing:2px;">45421334610</span>
+          <button class="copy-btn" onclick="copyIt('45421334610',this)">COPY</button>
+        </div>
+        <div style="text-align:center;margin-top:8px;"><a href="barberini.pdf" download style="font-family:Georgia,serif;font-size:11px;color:#4caf50;">⬇ Download voucher</a></div>
+      </div></div>
+      </div>
+
     </div>
     <div class="modal-cta" style="border-top:1px solid #2a2a4a;">
-      <button class="modal-btn" style="background:#ffd700;color:#1a1a2e;" onclick="closeGift()">★ AWESOME ★</button>
+      <button class="modal-btn" style="background:#ffd700;color:#1a1a2e;" onclick="closeGift()">★ Magnifique! ★</button>
     </div>
   </div>
 </div>
@@ -169,11 +195,11 @@ const teammates = [
   { name:"Laura",     photoSrc:"team_photos/Laura.png", wish:"Bon anniversaire, Thomas! Alles Liebe, viel Kuchen und Champagner (für dich als Franzosen natürlich ein Muss!) zu deinem Ehrentag - lass dich feiern! 🥂🎂" },
   { name:"Guillaume", photoSrc:"team_photos/Guillaume.png", wish:"Wishing you a wonderful birthday day Thomas! Hope you'll be enjoying it with your loved ones doing your favorite activities. Cheers to another year of sad salads, petanque and never ending loss at ping pong. 😄" },
   { name:"Izzy",      photoSrc:"team_photos/Izzy.png", wish:"Thomas, alles Gute zum Geburtstag! Hope you have a wonderful day filled with all the things that bring you joy 🤗 Sending best wishes and some sunshine from Australia ☀️😎" },
-  { name:"Sujay",     photoSrc:"team_photos/Sujay.png", wish:"Still writing... ✍️" },
+  { name:"Sujay",     photoSrc:"team_photos/Sujay.png", wish:"Joyeux anniversaire, Thomas ! 🎉 Wishing you a year full of happiness et plein de bons moments 🤩Thanks you for all the kindness, positive vibes and all the small talk 💬  I’m glad to have you around and here’s to more coffee runs 🏃 non-violent video games 🎮 and those healthy stair walks. Hope you have an amazing day ☀️❤️ " },
   { name:"Albert",    photoSrc:"team_photos/Albert.png", wish:"Still writing... ✍️" },
-  { name:"Tom",       photoSrc:"team_photos/Tom.png", wish:"Still writing... ✍️" },
+  { name:"Tom",       photoSrc:"team_photos/Tom.png", wish:"Happy Birthday Thomas, thanks for another great year. Hope you have a fantastic birthday" },
   { name:"Lizzy",     photoSrc:"team_photos/Lizzy.png", attachedPhoto:"team_photos/Lizzy-extra.png", wideModal:true, wish:"Alles Gute zum Geburtstag 🇩🇪 Joyeux anniversaire 🇫🇷 and Lá breithe shona duit 🇮🇪 to the international icon that you are, Thomas! Wishing you the most wonderful day of celebrations and joy surrounded by your loved ones 💗 ✨ Thank you for being the best-est desk buddy and for always brightening up the 4th floor with your stories, music recommendations and obscure 90s video references. Hope this year brings you lots of happiness - here's to many more 🍾💗" },
-  { name:"Ana",       photoSrc:"team_photos/Ana.png", wish:"Still writing... ✍️" },
+  { name:"Ana",       photoSrc:"team_photos/Ana.png", wish:"Happy birthday Thomasss 🥳🎊🍾🥳🎁 I am wishing you the best day, filled with good moments, love aaaand natürlich, Kuchen!! Sending you big hugs!" },
 ];
 // ============================================================
 
@@ -385,6 +411,11 @@ function tryGift(){
   document.getElementById('giftModal').classList.add('show');
 }
 function closeGift(){document.getElementById('giftModal').classList.remove('show');}
+function copyIt(code,btn){
+  navigator.clipboard.writeText(code).catch(()=>{});
+  btn.textContent='DONE!';
+  setTimeout(()=>btn.textContent='COPY',1500);
+}
 function copyCode(){
   navigator.clipboard.writeText(GIFT_CODE).catch(()=>{});
   const b=document.getElementById('copyBtn');
